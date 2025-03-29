@@ -1,14 +1,13 @@
-// src/App.jsx
-import { Box, Heading } from '@chakra-ui/react'
+import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
+import PokemonDetail from './pages/PokemonDetaill'
 
 function App() {
   return (
-    <Box textAlign="center" p={4}>
-      <Heading mb={6}>Pokédex</Heading>
-      <Home />
-    </Box>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/pokemon/:name" element={<PokemonDetail />} />
+    </Routes>
   )
 }
-
 export default App
