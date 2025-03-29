@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Box, Text, Button, Tag, HStack, Skeleton } from '@chakra-ui/react'
+import {
+  Box,
+  Text,
+  Button,
+  Tag,
+  HStack,
+  Skeleton
+} from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
 
 const typeColorMap = {
@@ -23,6 +30,27 @@ const typeColorMap = {
   steel: 'gray',
 }
 
+const bgColorMap = {
+  fire: 'red.100',
+  water: 'blue.100',
+  grass: 'green.100',
+  electric: 'yellow.100',
+  psychic: 'purple.100',
+  ice: 'cyan.100',
+  dragon: 'orange.100',
+  dark: 'gray.200',
+  fairy: 'pink.100',
+  normal: 'gray.100',
+  fighting: 'orange.200',
+  flying: 'blue.50',
+  poison: 'purple.100',
+  ground: 'yellow.200',
+  rock: 'yellow.300',
+  bug: 'green.200',
+  ghost: 'purple.200',
+  steel: 'gray.300',
+}
+
 function PokemonCard({ name, url }) {
   const [types, setTypes] = useState([])
   const [loading, setLoading] = useState(true)
@@ -39,6 +67,9 @@ function PokemonCard({ name, url }) {
       })
   }, [url])
 
+  const mainType = types[0]
+  const bgColor = bgColorMap[mainType] || 'gray.50'
+
   if (loading) {
     return (
       <Box p={4} borderWidth="1px" borderRadius="lg" textAlign="center">
@@ -52,14 +83,24 @@ function PokemonCard({ name, url }) {
       </Box>
     )
   }
-  
 
   return (
-    <Box p={4} borderWidth="1px" borderRadius="lg" textAlign="center">
+    <Box
+      p={4}
+      borderWidth="1px"
+      borderRadius="lg"
+      textAlign="center"
+      transition="all 0.2s"
+      bg={bgColor}
+      _hover={{
+        transform: 'scale(1.05)',
+        boxShadow: 'lg',
+        cursor: 'pointer',
+      }}
+    >
       <img src={imageUrl} alt={name} style={{ width: '100px', margin: '0 auto' }} />
       <Text fontWeight="bold" mt={2} mb={2}>{name.toUpperCase()}</Text>
 
-      {/* Tipos */}
       <HStack justify="center" spacing={2} mb={3}>
         {types.map((type, index) => (
           <Tag key={index} colorScheme={typeColorMap[type] || 'gray'}>
@@ -72,7 +113,6 @@ function PokemonCard({ name, url }) {
         Ver más
       </Button>
     </Box>
-    
   )
 }
 

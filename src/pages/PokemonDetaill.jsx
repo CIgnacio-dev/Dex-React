@@ -1,9 +1,19 @@
 import { useParams, Link as RouterLink } from 'react-router-dom'
-import { Button } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { useRef } from 'react'
+
 import {
-  Box, Heading, Image, Spinner, Text,
-  Center, HStack, Tag, VStack, Link
+  Box,
+  Heading,
+  Image,
+  Spinner,
+  Text,
+  Center,
+  HStack,
+  VStack,
+  Tag,
+  Link,
+  Button
 } from '@chakra-ui/react'
 
 const typeColorMap = {
@@ -20,11 +30,32 @@ const typeColorMap = {
   fighting: 'orange',
   flying: 'blue',
   poison: 'purple',
-  ground: 'brown',
+  ground: 'yellow',
   rock: 'yellow',
   bug: 'green',
   ghost: 'purple',
   steel: 'gray',
+}
+
+const bgColorMap = {
+  fire: 'red.100',
+  water: 'blue.100',
+  grass: 'green.100',
+  electric: 'yellow.100',
+  psychic: 'purple.100',
+  ice: 'cyan.100',
+  dragon: 'orange.100',
+  dark: 'gray.200',
+  fairy: 'pink.100',
+  normal: 'gray.100',
+  fighting: 'orange.200',
+  flying: 'blue.50',
+  poison: 'purple.100',
+  ground: 'yellow.200',
+  rock: 'yellow.300',
+  bug: 'green.200',
+  ghost: 'purple.200',
+  steel: 'gray.300',
 }
 
 function PokemonDetail() {
@@ -32,7 +63,12 @@ function PokemonDetail() {
   const [pokemon, setPokemon] = useState(null)
   const [evolutions, setEvolutions] = useState([])
   const [loading, setLoading] = useState(true)
-
+  const audioRef = useRef(null)
+  const playCry = () => {
+    if (audioRef.current) {
+      audioRef.current.play()
+    }
+  }
   useEffect(() => {
     fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
       .then(res => res.json())
@@ -66,20 +102,23 @@ function PokemonDetail() {
     )
   }
 
+  const mainType = pokemon.types[0]?.type.name
+  const bgColor = bgColorMap[mainType] || 'gray.50'
+
   return (
-    
-    <Box textAlign="center" p={6}>
-      <Heading mb={4}>{pokemon.name.toUpperCase()}</Heading>
+    <Box p={6} bg={bgColor} minH="100vh" textAlign="center">
       <Button
-  as={RouterLink}
-  to="/"
-  colorScheme="teal"
-  size="sm"
-  mt={4}
-  mb={6}
->
-  ← Volver a la Pokédex
-</Button>
+        as={RouterLink}
+        to="/"
+        colorScheme="teal"
+        size="sm"
+        mb={6}
+      >
+        ← Volver a la Pokédex
+      </Button>
+
+      <Heading mb={4}>{pokemon.name.toUpperCase()}</Heading>
+
       <Image
         src={pokemon.sprites.front_default}
         alt={pokemon.name}
@@ -87,7 +126,6 @@ function PokemonDetail() {
         boxSize="150px"
       />
 
-      {/* Tipos */}
       <HStack justify="center" mt={4} spacing={2}>
         {pokemon.types.map((t, index) => (
           <Tag key={index} colorScheme={typeColorMap[t.type.name] || 'gray'}>
@@ -95,8 +133,14 @@ function PokemonDetail() {
           </Tag>
         ))}
       </HStack>
-
-      {/* Info básica */}
+      <Button onClick={playCry} colorScheme="purple" size="sm" mt={4}>
+  🔊 Escuchar sonido
+</Button>
+<audio
+  ref={audioRef}
+  src={`https://play.pokemonshowdown.com/audio/cries/${pokemon.name.toLowerCase()}.mp3`}
+  preload="auto"
+/>
       <Text mt={4}>ID: {pokemon.id}</Text>
       <Text>Altura: {pokemon.height}</Text>
       <Text>Peso: {pokemon.weight}</Text>
