@@ -1,24 +1,25 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import {
   Box,
-  SimpleGrid,
-  Spinner,
   Center,
   HStack,
   Button,
   Text,
   Select,
   Skeleton,
-  Fade
 } from '@chakra-ui/react'
+import { useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+
 import { getPokemons, getAllPokemons } from '../services/api'
-import PokemonCard from '../components/PokemonCard'
+import SearchBar from '../components/SearchBar'
+import PokemonGrid from '../components/PokemonGrid'
+import Pagination from '../components/Pagination'
+import LoadingSkeletons from '../components/LoadingSkeletons'
 
 function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = parseInt(searchParams.get('page')) || 1
-
   const limit = 20
   const total = 1010
   const totalPages = Math.ceil(total / limit)
@@ -28,12 +29,15 @@ function Home() {
   const [allPokemons, setAllPokemons] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [selectedType, setSelectedType] = useState('')
+  const [sortBy, setSortBy] = useState('name-asc')
 
+  // Cargar todos los Pokémon (para búsqueda + tipos)
   useEffect(() => {
     getAllPokemons().then(data => setAllPokemons(data))
   }, [])
 
-
+  // Cargar Pokémon por página (cuando no hay búsqueda)
   useEffect(() => {
     setLoading(true)
     getPokemons(limit, offset)
@@ -41,105 +45,72 @@ function Home() {
       .finally(() => setLoading(false))
   }, [offset])
 
+  // Aplicar filtros (nombre + tipo)
+  const filteredPokemons = (search ? allPokemons : pokemons).filter(p =>
+    p.name.includes(search) &&
+    (!selectedType || p.types?.includes?.(selectedType))
+  )
 
-  if (loading) {
-    return (
-      <Box p={6}>
-        <Skeleton height="40px" mb={6} maxW="300px" mx="auto" />
-        <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
-          {Array.from({ length: 20 }).map((_, i) => (
-            <Box key={i} p={4} borderWidth="1px" borderRadius="lg">
-              <Skeleton height="100px" mb={2} />
-              <Skeleton height="20px" mb={2} />
-              <Skeleton height="32px" />
-            </Box>
-          ))}
-        </SimpleGrid>
-      </Box>
-    )
-  }
+  const sortedPokemons = [...filteredPokemons].sort((a, b) => {
+    const idA = a.url ? parseInt(a.url.split("/").filter(Boolean).pop()) : 0
+    const idB = b.url ? parseInt(b.url.split("/").filter(Boolean).pop()) : 0
+
+    switch (sortBy) {
+      case "name-asc":
+        return a.name.localeCompare(b.name)
+      case "name-desc":
+        return b.name.localeCompare(a.name)
+      case "id-asc":
+        return idA - idB
+      case "id-desc":
+        return idB - idA
+      default:
+        return 0
+    }
+  })
 
   return (
     <Box p={6}>
-      {/*  Barra de búsqueda */}
-      <Box maxW="300px" mx="auto" mb={6}>
-        <input
-          type="text"
-          placeholder="Buscar Pokémon..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value.toLowerCase())}
-          style={{
-            width: '100%',
-            padding: '8px 12px',
-            border: '1px solid #ccc',
-            borderRadius: '8px'
-          }}
-        />
+      {/* Buscador + Filtro por tipo */}
+      <Button as={Link} to="/comparar" colorScheme="blue" size="sm">
+  Ver comparación
+</Button>
+      <SearchBar
+        search={search}
+        onSearch={setSearch}
+        selectedType={selectedType}
+        onSelectType={setSelectedType}
+      />
+
+      {/* Selector de ordenamiento */}
+      <Box maxW="300px" mx="auto" mb={4}>
+        <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="name-asc">Nombre A → Z</option>
+          <option value="name-desc">Nombre Z → A</option>
+          <option value="id-asc">ID Ascendente</option>
+          <option value="id-desc">ID Descendente</option>
+        </Select>
       </Box>
 
-       
-      {search ? (
-        <>
-          <Text mb={4} fontWeight="bold">Resultados de búsqueda:</Text>
-          <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
-            {allPokemons
-              .filter(p => p.name.includes(search))
-              .slice(0, 20) // Limitar a 20 resultados
-              .map((pokemon, index) => (
-                <Fade in key={index}>
-                  <PokemonCard name={pokemon.name} url={pokemon.url} />
-                </Fade>
-              ))}
-          </SimpleGrid>
-        </>
-      ) : (
-        <>
-          <SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
-            {pokemons.map((pokemon, index) => (
-              <Fade in key={index}>
-                <PokemonCard name={pokemon.name} url={pokemon.url} />
-              </Fade>
-            ))}
-          </SimpleGrid>
+      {/*  Grid de resultados */}
+      <Box mt={6}>
+        {loading
+          ? <LoadingSkeletons count={20} />
+          : <PokemonGrid
+              pokemons={sortedPokemons}
+              loading={false}
+              selectedType={selectedType}
+            />
+        }
+      </Box>
 
-            
-          <Center mt={8} flexDirection="column">
-            <HStack spacing={4}>
-              <Button
-                onClick={() => setSearchParams({ page: page - 1 })}
-                isDisabled={page === 1}
-                colorScheme="teal"
-                variant="outline"
-              >
-                ← Anterior
-              </Button>
-
-              <Select
-                width="100px"
-                value={page}
-                onChange={(e) =>
-                  setSearchParams({ page: e.target.value })
-                }
-              >
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    Página {i + 1}
-                  </option>
-                ))}
-              </Select>
-
-              <Button
-                onClick={() => setSearchParams({ page: page + 1 })}
-                isDisabled={page >= totalPages}
-                colorScheme="teal"
-              >
-                Siguiente →
-              </Button>
-            </HStack>
-
-            <Text mt={2}>Página {page} de {totalPages}</Text>
-          </Center>
-        </>
+      {/*  Paginación  */}
+      {!search && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setSearchParams({ page: newPage })}
+        />
       )}
     </Box>
   )

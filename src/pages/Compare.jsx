@@ -1,30 +1,56 @@
 import { useEffect, useState } from 'react';
-import { Box, Text, Button, Tag, HStack, Skeleton, Checkbox, VStack } from '@chakra-ui/react';
+import { Box, Text, Button, Tag, HStack, Skeleton, Checkbox } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '../context/FavoriteContext';
 import { useCompare } from '../context/CompareContext';
 import { StarIcon } from '@chakra-ui/icons';
 
 const typeColorMap = {
-  fire: 'red', water: 'blue', grass: 'green', electric: 'yellow',
-  psychic: 'purple', ice: 'cyan', dragon: 'orange', dark: 'gray',
-  fairy: 'pink', normal: 'gray', fighting: 'orange', flying: 'blue',
-  poison: 'purple', ground: 'yellow', rock: 'yellow', bug: 'green',
-  ghost: 'purple', steel: 'gray',
+  fire: 'red',
+  water: 'blue',
+  grass: 'green',
+  electric: 'yellow',
+  psychic: 'purple',
+  ice: 'cyan',
+  dragon: 'orange',
+  dark: 'gray',
+  fairy: 'pink',
+  normal: 'gray',
+  fighting: 'orange',
+  flying: 'blue',
+  poison: 'purple',
+  ground: 'yellow',
+  rock: 'yellow',
+  bug: 'green',
+  ghost: 'purple',
+  steel: 'gray',
 };
 
 const bgColorMap = {
-  fire: 'red.100', water: 'blue.100', grass: 'green.100', electric: 'yellow.100',
-  psychic: 'purple.100', ice: 'cyan.100', dragon: 'orange.100', dark: 'gray.200',
-  fairy: 'pink.100', normal: 'gray.100', fighting: 'orange.200', flying: 'blue.50',
-  poison: 'purple.100', ground: 'yellow.200', rock: 'yellow.300', bug: 'green.200',
-  ghost: 'purple.200', steel: 'gray.300',
+  fire: 'red.100',
+  water: 'blue.100',
+  grass: 'green.100',
+  electric: 'yellow.100',
+  psychic: 'purple.100',
+  ice: 'cyan.100',
+  dragon: 'orange.100',
+  dark: 'gray.200',
+  fairy: 'pink.100',
+  normal: 'gray.100',
+  fighting: 'orange.200',
+  flying: 'blue.50',
+  poison: 'purple.100',
+  ground: 'yellow.200',
+  rock: 'yellow.300',
+  bug: 'green.200',
+  ghost: 'purple.200',
+  steel: 'gray.300',
 };
 
 function PokemonCard({ name, url }) {
   const [types, setTypes] = useState([]);
-  const [imageUrl, setImageUrl] = useState("");
   const [stats, setStats] = useState({});
+  const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const { toggleFavorite, isFavorite } = useFavorites();
   const { toggleCompare, isCompared } = useCompare();
@@ -41,12 +67,12 @@ function PokemonCard({ name, url }) {
           data.sprites?.front_default ||
           `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${data.id}.png`
         );
-        setStats({
-          hp: data.stats.find((s) => s.stat.name === "hp")?.base_stat,
-          attack: data.stats.find((s) => s.stat.name === "attack")?.base_stat,
-          defense: data.stats.find((s) => s.stat.name === "defense")?.base_stat,
-          speed: data.stats.find((s) => s.stat.name === "speed")?.base_stat,
-        });
+        setStats(
+          data.stats.reduce((acc, stat) => {
+            acc[stat.stat.name] = stat.base_stat;
+            return acc;
+          }, {})
+        );
       } catch (error) {
         console.error("Error al cargar datos del Pokémon:", error);
       } finally {
@@ -78,7 +104,11 @@ function PokemonCard({ name, url }) {
       textAlign="center"
       transition="all 0.2s"
       bg={bgColor}
-      _hover={{ transform: 'scale(1.05)', boxShadow: 'lg', cursor: 'pointer' }}
+      _hover={{
+        transform: 'scale(1.05)',
+        boxShadow: 'lg',
+        cursor: 'pointer',
+      }}
     >
       <img
         src={imageUrl}
@@ -86,7 +116,7 @@ function PokemonCard({ name, url }) {
         style={{ width: '100px', margin: '0 auto' }}
       />
 
-      <HStack justify="center" spacing={2} mb={2} mt={2}>
+      <HStack justify="center" spacing={2} mb={2}>
         <Text fontWeight="bold">{name.toUpperCase()}</Text>
         <StarIcon
           boxSize={4}
@@ -105,27 +135,23 @@ function PokemonCard({ name, url }) {
       </HStack>
 
       <Box mt={2} mb={2}>
-        <Text fontSize="sm">❤️ {stats.hp}</Text>
-        <HStack justify="center" spacing={3}>
-          <Text fontSize="sm">⚔️ {stats.attack}</Text>
-          <Text fontSize="sm">🛡 {stats.defense}</Text>
-        </HStack>
-        <Text fontSize="sm">⚡ {stats.speed}</Text>
+        <Text fontSize="sm">❤️ HP: {stats.hp}</Text>
+        <Text fontSize="sm">⚔️ Atk: {stats.attack} | 🛡 Def: {stats.defense}</Text>
+        <Text fontSize="sm">⚡ Vel: {stats.speed}</Text>
       </Box>
 
-      <VStack spacing={2} mt={3}>
-        <Checkbox
-          isChecked={isCompared(name)}
-          onChange={() => toggleCompare(name)}
-          colorScheme="blue"
-        >
-          Comparar
-        </Checkbox>
+      <Checkbox
+        isChecked={isCompared(name)}
+        onChange={() => toggleCompare(name)}
+        mb={2}
+        colorScheme="blue"
+      >
+        Comparar
+      </Checkbox>
 
-        <Button as={Link} to={`/pokemon/${name}`} colorScheme="teal" size="sm">
-          Ver más
-        </Button>
-      </VStack>
+      <Button as={Link} to={`/pokemon/${name}`} colorScheme="teal" size="sm">
+        Ver más
+      </Button>
     </Box>
   );
 }
