@@ -14,7 +14,7 @@ function Navbar() {
           <Button as={Link} to="/favoritos" variant="ghost" colorScheme="teal">Favoritos</Button>
           <Button as={Link} to="/comparar" variant="ghost" colorScheme="teal">Comparar</Button>
           <Button as={Link} to="/top" variant="ghost" colorScheme="teal">Top List👑</Button>
-
+          <Button as={Link} to="/equipo" variant="ghost" colorScheme="blue">Mi Equipo</Button>
 
         </HStack>
       </Flex>

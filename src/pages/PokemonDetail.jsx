@@ -180,18 +180,30 @@ setEvolutions(evoChain)
         ← Volver a la Pokédex
       </Button>
 
-      <Flex direction={['column', 'column', 'row']} mt={6} align="center" justify="center" gap={10}>
-  <Box flex="1" textAlign="center">
+      <Flex
+  direction={['column', 'column', 'row']} // column en mobile y tablets, row en desktop
+  wrap="wrap"
+  mt={6}
+  align="center"
+  justify="center"
+  gap={[6, 8, 12]} 
+>
+  {/*  Sección izquierda - Datos  */}
+  <Box
+    flex="1"
+    minW={['100%', '100%', '300px']}
+    textAlign="center"
+  >
     <Heading mb={4}>{pokemon.name.toUpperCase()}</Heading>
 
     <Image
       src={pokemon.sprites.front_default}
       alt={pokemon.name}
       mx="auto"
-      boxSize="150px"
+      boxSize={['120px', '150px', '180px']}
     />
 
-    <HStack justify="center" mt={4} spacing={2}>
+    <HStack justify="center" mt={4} spacing={2} wrap="wrap">
       {pokemon.types.map((t, index) => (
         <Tag key={index} colorScheme={typeColorMap[t.type.name] || 'gray'}>
           {t.type.name.toUpperCase()}
@@ -208,11 +220,18 @@ setEvolutions(evoChain)
     <Text>Peso: {pokemon.weight}</Text>
   </Box>
 
-  <Box flex="1" maxW="400px">
+  {/* Sección derecha - Gráfico */}
+  <Box
+    flex="1"
+    maxW={['100%', '400px']}
+    w="100%"
+    textAlign="center"
+  >
     <Heading size="md" mb={4}>Estadísticas</Heading>
     <Radar data={radarData} options={radarOptions} />
   </Box>
 </Flex>
+
 
 
 

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useFavorites } from '../context/FavoriteContext';
 import { useCompare } from '../context/CompareContext';
 import { StarIcon } from '@chakra-ui/icons';
+import { useTeam } from '../context/TeamContext';
 
 const typeColorMap = {
   fire: 'red', water: 'blue', grass: 'green', electric: 'yellow',
@@ -29,6 +30,7 @@ function PokemonCard({ name, url }) {
   const [loading, setLoading] = useState(true);
   const { toggleFavorite, isFavorite } = useFavorites();
   const { toggleCompare, isCompared } = useCompare();
+  const { addToTeam, team } = useTeam();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -132,6 +134,15 @@ function PokemonCard({ name, url }) {
         <Button as={Link} to={`/pokemon/${name}`} colorScheme="teal" size="sm">
           Ver más
         </Button>
+        <Button
+  onClick={() => addToTeam({ name, url })}
+  size="xs"
+  mt={2}
+  colorScheme={team.find(p => p.name === name) ? 'green' : 'blue'}
+  isDisabled={team.length >= 6 && !team.find(p => p.name === name)}
+>
+  {team.find(p => p.name === name) ? 'En equipo' : 'Agregar al equipo'}
+</Button>
       </VStack>
     </Box>
   );

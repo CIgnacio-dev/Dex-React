@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { FavoritesProvider } from "./context/FavoriteContext";
 import { CompareProvider } from './context/CompareContext'
+import { TeamProvider } from './context/TeamContext';
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <ChakraProvider>
         <FavoritesProvider>
           <CompareProvider>
-            <App />
+            <TeamProvider>
+              <App />
+            </TeamProvider>
           </CompareProvider>
         </FavoritesProvider>
       </ChakraProvider>
