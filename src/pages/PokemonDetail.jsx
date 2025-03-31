@@ -11,8 +11,28 @@ import {
   VStack,
   Tag,
   Link,
-  Button
+  Button,
+  Flex
 } from '@chakra-ui/react'
+import { Radar } from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+} from 'chart.js'
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+)
 
 const typeColorMap = {
   fire: 'red',
@@ -123,7 +143,31 @@ setEvolutions(evoChain)
 
   const mainType = pokemon.types[0]?.type.name
   const bgColor = bgColorMap[mainType] || 'gray.50'
-
+  const radarData = {
+    labels: ['HP', 'ATK', 'DEF', 'AT. ESP', 'DEF. ESP', 'VEL'],
+    datasets: [
+      {
+        label: 'Stats Base',
+        data: pokemon.stats.map(s => s.base_stat),
+        backgroundColor: 'rgba(72, 187, 120, 0.2)',
+        borderColor: 'rgba(72, 187, 120, 1)',
+        borderWidth: 2
+      }
+    ]
+  }
+  
+  const radarOptions = {
+    scales: {
+      r: {
+        suggestedMin: 20,
+        suggestedMax: 150,
+        ticks: {
+          stepSize: 20
+        }
+      }
+    }
+  }
+  
   return (
     <Box p={6} bg={bgColor} minH="100vh" textAlign="center">
       <Button
@@ -136,40 +180,41 @@ setEvolutions(evoChain)
         ← Volver a la Pokédex
       </Button>
 
-      <Heading mb={2}>{pokemon.name.toUpperCase()}</Heading>
+      <Flex direction={['column', 'column', 'row']} mt={6} align="center" justify="center" gap={10}>
+  <Box flex="1" textAlign="center">
+    <Heading mb={4}>{pokemon.name.toUpperCase()}</Heading>
 
-      <Text mt={2} fontStyle="italic" color="gray.700">
-        {description}
-      </Text>
+    <Image
+      src={pokemon.sprites.front_default}
+      alt={pokemon.name}
+      mx="auto"
+      boxSize="150px"
+    />
 
-      <Image
-        src={pokemon.sprites.front_default}
-        alt={pokemon.name}
-        mx="auto"
-        boxSize="150px"
-        mt={4}
-      />
+    <HStack justify="center" mt={4} spacing={2}>
+      {pokemon.types.map((t, index) => (
+        <Tag key={index} colorScheme={typeColorMap[t.type.name] || 'gray'}>
+          {t.type.name.toUpperCase()}
+        </Tag>
+      ))}
+    </HStack>
 
-      <HStack justify="center" mt={4} spacing={2}>
-        {pokemon.types.map((t, index) => (
-          <Tag key={index} colorScheme={typeColorMap[t.type.name] || 'gray'}>
-            {t.type.name.toUpperCase()}
-          </Tag>
-        ))}
-      </HStack>
+    <Button onClick={playCry} colorScheme="purple" size="sm" mt={4}>
+      🔊 Escuchar sonido
+    </Button>
 
-      <Button onClick={playCry} colorScheme="purple" size="sm" mt={4}>
-        🔊 Escuchar sonido
-      </Button>
-      <audio
-        ref={audioRef}
-        src={`https://play.pokemonshowdown.com/audio/cries/${pokemon.name.toLowerCase()}.mp3`}
-        preload="auto"
-      />
+    <Text mt={4}>ID: {pokemon.id}</Text>
+    <Text>Altura: {pokemon.height}</Text>
+    <Text>Peso: {pokemon.weight}</Text>
+  </Box>
 
-      <Text mt={4}>ID: {pokemon.id}</Text>
-      <Text>Altura: {pokemon.height}</Text>
-      <Text>Peso: {pokemon.weight}</Text>
+  <Box flex="1" maxW="400px">
+    <Heading size="md" mb={4}>Estadísticas</Heading>
+    <Radar data={radarData} options={radarOptions} />
+  </Box>
+</Flex>
+
+
 
       {/* Línea evolutiva */}
       <Box mt={8}>
