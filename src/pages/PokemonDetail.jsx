@@ -1,7 +1,5 @@
 import { useParams, Link as RouterLink } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { useRef } from 'react'
-
+import { useEffect, useState, useRef } from 'react'
 import {
   Box,
   Heading,
@@ -62,13 +60,16 @@ function PokemonDetail() {
   const { name } = useParams()
   const [pokemon, setPokemon] = useState(null)
   const [evolutions, setEvolutions] = useState([])
+  const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(true)
   const audioRef = useRef(null)
+
   const playCry = () => {
     if (audioRef.current) {
       audioRef.current.play()
     }
   }
+
   useEffect(() => {
     fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
       .then(res => res.json())
@@ -81,15 +82,33 @@ function PokemonDetail() {
   useEffect(() => {
     fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`)
       .then(res => res.json())
-      .then(species => fetch(species.evolution_chain.url))
+      .then(species => {
+        const entry = species.flavor_text_entries.find(
+          (entry) => entry.language.name === 'es'
+        )
+        setDescription(entry ? entry.flavor_text.replace(/\f/g, ' ') : 'Sin descripción.')
+        return fetch(species.evolution_chain.url)
+      })
       .then(res => res.json())
       .then(data => {
         const evoChain = []
-        let current = data.chain
-        while (current) {
-          evoChain.push(current.species.name)
-          current = current.evolves_to[0]
-        }
+let current = data.chain
+
+while (current && current.species) {
+  const evoName = current.species.name
+  const details = current.evolution_details?.[0]
+  const minLevel = details?.min_level || null
+
+  evoChain.push({
+    name: evoName,
+    level: minLevel
+  })
+
+  current = current.evolves_to?.[0]
+}
+
+setEvolutions(evoChain)
+
         setEvolutions(evoChain)
       })
   }, [name])
@@ -117,13 +136,18 @@ function PokemonDetail() {
         ← Volver a la Pokédex
       </Button>
 
-      <Heading mb={4}>{pokemon.name.toUpperCase()}</Heading>
+      <Heading mb={2}>{pokemon.name.toUpperCase()}</Heading>
+
+      <Text mt={2} fontStyle="italic" color="gray.700">
+        {description}
+      </Text>
 
       <Image
         src={pokemon.sprites.front_default}
         alt={pokemon.name}
         mx="auto"
         boxSize="150px"
+        mt={4}
       />
 
       <HStack justify="center" mt={4} spacing={2}>
@@ -133,14 +157,16 @@ function PokemonDetail() {
           </Tag>
         ))}
       </HStack>
+
       <Button onClick={playCry} colorScheme="purple" size="sm" mt={4}>
-  🔊 Escuchar sonido
-</Button>
-<audio
-  ref={audioRef}
-  src={`https://play.pokemonshowdown.com/audio/cries/${pokemon.name.toLowerCase()}.mp3`}
-  preload="auto"
-/>
+        🔊 Escuchar sonido
+      </Button>
+      <audio
+        ref={audioRef}
+        src={`https://play.pokemonshowdown.com/audio/cries/${pokemon.name.toLowerCase()}.mp3`}
+        preload="auto"
+      />
+
       <Text mt={4}>ID: {pokemon.id}</Text>
       <Text>Altura: {pokemon.height}</Text>
       <Text>Peso: {pokemon.weight}</Text>
@@ -151,25 +177,31 @@ function PokemonDetail() {
           Línea evolutiva
         </Text>
         <HStack justify="center" spacing={6}>
-          {evolutions.map((evoName, index) => (
-            <HStack key={evoName}>
-              <VStack spacing={1}>
-                <Link as={RouterLink} to={`/pokemon/${evoName}`}>
-                  <Image
-                    src={`https://img.pokemondb.net/sprites/home/normal/${evoName}.png`}
-                    alt={evoName}
-                    boxSize="70px"
-                    mx="auto"
-                  />
-                  <Text fontSize="sm">{evoName}</Text>
-                </Link>
-              </VStack>
+        {evolutions.map((evo, index) => (
+  <HStack key={evo.name}>
+    <VStack spacing={1}>
+      <Link as={RouterLink} to={`/pokemon/${evo.name}`}>
+        <Image
+          src={`https://img.pokemondb.net/sprites/home/normal/${evo.name}.png`}
+          alt={evo.name}
+          boxSize="70px"
+          mx="auto"
+        />
+        <Text fontSize="sm">{evo.name}</Text>
+      </Link>
+    </VStack>
 
-              {index < evolutions.length - 1 && (
-                <Text fontSize="2xl" fontWeight="bold">→</Text>
-              )}
-            </HStack>
-          ))}
+    {index < evolutions.length - 1 && (
+      <VStack spacing={0}>
+        <Text fontSize="xs" fontWeight="medium" color="gray.600">
+          {evolutions[index + 1]?.level ? `Nivel ${evolutions[index + 1].level}` : '→'}
+        </Text>
+        <Text fontSize="2xl" fontWeight="bold">→</Text>
+      </VStack>
+    )}
+  </HStack>
+))}
+
         </HStack>
       </Box>
     </Box>
