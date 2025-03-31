@@ -1,21 +1,23 @@
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-import PokemonDetail from './pages/PokemonDetaill'
+import PokemonDetail from './pages/PokemonDetail'
 import Favorites from './pages/Favorites'
 import Compare from './pages/Compare'
 import Navbar from './components/Navbar'
+import { Box } from '@chakra-ui/react'
 
 function App() {
   return (
     <>
-      <Navbar /> 
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/pokemon/:name" element={<PokemonDetail />} />
-        <Route path="/favoritos" element={<Favorites />} />
-        <Route path="/comparar" element={<Compare />} />
-      </Routes>
+      <Navbar />
+      <Box as="main" pt={6} pb={10} px={4} maxW="1200px" mx="auto" bg="gray.50" minH="100vh">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/pokemon/:name" element={<PokemonDetail />} />
+          <Route path="/favoritos" element={<Favorites />} />
+          <Route path="/comparar" element={<Compare />} />
+        </Routes>
+      </Box>
     </>
   )
 }

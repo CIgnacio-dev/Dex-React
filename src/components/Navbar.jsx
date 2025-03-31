@@ -1,22 +1,22 @@
-import { Box, HStack, Button } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Box, Flex, Heading, Spacer, Button, HStack } from '@chakra-ui/react'
+import { Link } from 'react-router-dom'
 
 function Navbar() {
   return (
-    <Box bg="gray.100" p={4} mb={4} boxShadow="sm">
-      <HStack spacing={4}>
-        <Button as={Link} to="/" colorScheme="teal" variant="ghost">
-          Inicio
-        </Button>
-        <Button as={Link} to="/favoritos" colorScheme="teal" variant="ghost">
-          Favoritos
-        </Button>
-        <Button as={Link} to="/comparar" colorScheme="teal" variant="ghost">
-          Comparar
-        </Button>
-      </HStack>
+    <Box bg="white" boxShadow="sm" px={6} py={4} position="sticky" top="0" zIndex="100">
+      <Flex align="center" maxW="1200px" mx="auto">
+        <Heading size="md" color="teal.600">
+          DexReact
+        </Heading>
+        <Spacer />
+        <HStack spacing={4}>
+          <Button as={Link} to="/" variant="ghost" colorScheme="teal">Inicio</Button>
+          <Button as={Link} to="/favoritos" variant="ghost" colorScheme="teal">Favoritos</Button>
+          <Button as={Link} to="/comparar" variant="ghost" colorScheme="teal">Comparar</Button>
+        </HStack>
+      </Flex>
     </Box>
-  );
+  )
 }
 
-export default Navbar;
+export default Navbar
