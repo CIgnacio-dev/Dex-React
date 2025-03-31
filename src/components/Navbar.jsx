@@ -13,6 +13,9 @@ function Navbar() {
           <Button as={Link} to="/" variant="ghost" colorScheme="teal">Inicio</Button>
           <Button as={Link} to="/favoritos" variant="ghost" colorScheme="teal">Favoritos</Button>
           <Button as={Link} to="/comparar" variant="ghost" colorScheme="teal">Comparar</Button>
+          <Button as={Link} to="/top" variant="ghost" colorScheme="teal">Top List👑</Button>
+
+
         </HStack>
       </Flex>
     </Box>

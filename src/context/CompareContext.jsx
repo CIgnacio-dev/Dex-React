@@ -1,40 +1,25 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from "react";
 
-const CompareContext = createContext()
+const CompareContext = createContext();
 
-export function CompareProvider({ children }) {
-  const [selected, setSelected] = useState([])
-
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('compare')) || []
-    setSelected(saved)
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('compare', JSON.stringify(selected))
-  }, [selected])
+export const CompareProvider = ({ children }) => {
+  const [compared, setCompared] = useState([]);
 
   const toggleCompare = (name) => {
-    setSelected((prev) =>
-      prev.includes(name)
-        ? prev.filter((n) => n !== name)
-        : [...prev, name]
-    )
-  }
+    setCompared((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+    );
+  };
 
-  const isCompared = (name) => selected.includes(name)
+  const clearCompared = () => setCompared([]);
 
-  const clearCompare = () => setSelected([])
+  const isCompared = (name) => compared.includes(name);
 
   return (
-    <CompareContext.Provider
-      value={{ selected, toggleCompare, isCompared, clearCompare }}
-    >
+    <CompareContext.Provider value={{ compared, toggleCompare, clearCompared, isCompared }}>
       {children}
     </CompareContext.Provider>
-  )
-}
+  );
+};
 
-export function useCompare() {
-  return useContext(CompareContext)
-}
+export const useCompare = () => useContext(CompareContext);

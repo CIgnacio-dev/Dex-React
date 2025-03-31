@@ -5,6 +5,7 @@ import Favorites from './pages/Favorites'
 import Compare from './pages/Compare'
 import Navbar from './components/Navbar'
 import { Box } from '@chakra-ui/react'
+import TopList from './pages/TopList'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/pokemon/:name" element={<PokemonDetail />} />
           <Route path="/favoritos" element={<Favorites />} />
           <Route path="/comparar" element={<Compare />} />
+          <Route path="/top" element={<TopList />} />
         </Routes>
       </Box>
     </>
