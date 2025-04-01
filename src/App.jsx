@@ -7,11 +7,13 @@ import Navbar from './components/Navbar'
 import { Box } from '@chakra-ui/react'
 import TopList from './pages/TopList'
 import Team from './pages/Team';
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   return (
     <>
       <Navbar />
+      <Analytics />
       <Box as="main" pt={6} pb={10} px={4} maxW="1200px" mx="auto" bg="gray.50" minH="100vh">
         <Routes>
           <Route path="/" element={<Home />} />
