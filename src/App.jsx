@@ -14,7 +14,17 @@ function App() {
     <>
       <Navbar />
       <Analytics />
-      <Box as="main" pt={6} pb={10} px={4} maxW="1200px" mx="auto" bg="gray.50" minH="100vh">
+      <Box
+  as="main"
+  pt={6}
+  pb={10}
+  px={{ base: 4, md: 6 }}
+  maxW="1200px"
+  mx="auto"
+  bg="gray.50"
+  minH="100vh"
+  w="100%"
+>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/pokemon/:name" element={<PokemonDetail />} />
